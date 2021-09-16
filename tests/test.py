@@ -53,8 +53,23 @@ def test_c(baseURL):
     minDate = datetime.strptime(response.json()["route_min_time"], "%Y-%m-%dT%H:%M:%S.%fZ")
     maxDate = datetime.strptime(response.json()["route_max_time"], "%Y-%m-%dT%H:%M:%S.%fZ") 
 
-    weight = 0
     for deliverie in deliveries:
         if deliverie["algorithm_fields"]["type"] == "delivery":
-            etaDate = datetime.strptime(deliverie["algorithm_fields"]["eta"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            etaDate = datetime.strptime(ç, "%Y-%m-%dT%H:%M:%S.%fZ")
             assert minDate <= etaDate <= maxDate  
+
+
+def test_d(baseURL):
+    url = baseURL + "/planned_route"
+    response = requests.get(url)
+    assert response.status_code == 200
+
+    deliveries = response.json()["deliveries"]
+    for deliverie in deliveries:
+        
+        etaDate = datetime.strptime(deliverie["algorithm_fields"]["eta"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        minDate = datetime.strptime(deliverie["min_time"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        maxDate = datetime.strptime(deliverie["max_time"], "%Y-%m-%dT%H:%M:%S.%fZ") 
+        
+        assert minDate <= etaDate <= maxDate   
+            
