@@ -27,4 +27,18 @@ def test_a(baseURL):
             founds += 1
 
     assert founds == len(plannedDeliveries)
-    
+
+def test_b(baseURL):
+    url = baseURL + "/planned_route"
+    response = requests.get(url)
+    assert response.status_code == 200
+
+    deliveries = response.json()["deliveries"]
+    carryingCapacity = response.json()["resource"]["carrying_capacity"]
+
+    weight = 0
+    for deliverie in deliveries:
+        if deliverie["algorithm_fields"]["type"] == "delivery":
+            weight +=  deliverie["algorithm_fields"]["weight"]
+
+    assert weight <= carryingCapacity
