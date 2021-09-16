@@ -1,5 +1,6 @@
 import requests
 import pytest
+from datetime import datetime
 
 @pytest.fixture
 def baseURL():
@@ -42,3 +43,18 @@ def test_b(baseURL):
             weight +=  deliverie["algorithm_fields"]["weight"]
 
     assert weight <= carryingCapacity
+
+def test_c(baseURL):
+    url = baseURL + "/planned_route"
+    response = requests.get(url)
+    assert response.status_code == 200
+
+    deliveries = response.json()["deliveries"]
+    minDate = datetime.strptime(response.json()["route_min_time"], "%Y-%m-%dT%H:%M:%S.%fZ")
+    maxDate = datetime.strptime(response.json()["route_max_time"], "%Y-%m-%dT%H:%M:%S.%fZ") 
+
+    weight = 0
+    for deliverie in deliveries:
+        if deliverie["algorithm_fields"]["type"] == "delivery":
+            etaDate = datetime.strptime(deliverie["algorithm_fields"]["eta"], "%Y-%m-%dT%H:%M:%S.%fZ")
+            assert minDate <= etaDate <= maxDate  
