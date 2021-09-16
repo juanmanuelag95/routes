@@ -1,6 +1,6 @@
 import requests
 import pytest
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @pytest.fixture
 def baseURL():
@@ -55,9 +55,8 @@ def test_c(baseURL):
 
     for deliverie in deliveries:
         if deliverie["algorithm_fields"]["type"] == "delivery":
-            etaDate = datetime.strptime(ç, "%Y-%m-%dT%H:%M:%S.%fZ")
+            etaDate = datetime.strptime(deliverie["algorithm_fields"]["eta"], "%Y-%m-%dT%H:%M:%S.%fZ")
             assert minDate <= etaDate <= maxDate  
-
 
 def test_d(baseURL):
     url = baseURL + "/planned_route"
@@ -73,3 +72,28 @@ def test_d(baseURL):
         
         assert minDate <= etaDate <= maxDate   
             
+def test_e(baseURL):
+
+    url = baseURL + "/planned_route"
+    response = requests.get(url)
+    assert response.status_code == 200
+
+    deliveries = response.json()["deliveries"]
+
+    difference = []
+    for i in range(0, len(deliveries) - 2):
+        etaDate1 = datetime.strptime(deliveries[i+1]["algorithm_fields"]["eta"], "%Y-%m-%dT%H:%M:%S.%fZ")
+        etaDate2 = datetime.strptime(deliveries[i+2]["algorithm_fields"]["eta"], "%Y-%m-%dT%H:%M:%S.%fZ")
+
+        difference.append(etaDate2 - etaDate1)
+    
+    for i in range(0, len(deliveries) - 2):
+        flag = False
+        timeToNext = int(deliveries[i]["algorithm_fields"]["time_to_next"])
+        
+        for j in range(i, len(difference)):
+            if timedelta(seconds=timeToNext) <= difference[j]:
+               flag = True
+               break
+      
+        assert flag == True
