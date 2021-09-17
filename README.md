@@ -10,6 +10,8 @@ $ npm install -g json-server
 ```
 
 ## Executing the Framework
+Run `json-server --watch db.json` to launch the JSON Server
+
 Run `pytest tests/test.py` from the command line from root directory.
 
 ```
