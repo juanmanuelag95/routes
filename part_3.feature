@@ -37,7 +37,7 @@ Scenario: Restock supplies
   When Is the following day
   Then The stock should be enought to make "100" tacos
 
-@E2E
+@E2E @TacoTruck_4
 Scenario: E2E on groceries restock
   Given I have enought supplies to make <stock> tacos
   When I get an order for <number> of tacos
@@ -56,4 +56,13 @@ Scenario: E2E on groceries restock
     | 100   | 4      | 81     | false    |
     | 100   | 4      | 80     | false    |
     | 100   | 4      | 79     | false    |
-    
+
+ @E2E @TacoTruck_5 
+  Scenario: Able to use the new day stock
+  Given There are products left by end of day
+  When Is the following day
+  Then The stock should be enought to make "100" tacos
+  When I get an order for "20" of tacos
+  And I check if have to go to the store "2" before the end of shift
+  Then The response code is equal to "200"
+  And The response body should contain the message "false"
